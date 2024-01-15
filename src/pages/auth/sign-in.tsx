@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -17,7 +18,20 @@ export function SignIn() {
     const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInForm>()
 
     function handleSignIn(data: SignInForm) {
-        console.log(data)
+
+        try {
+            console.log(data)
+
+            toast.success('We send an authentication link to your e-mail.', {
+                action: {
+                    label: 'Resend',
+                    onClick: () => handleSignIn(data)
+                }
+            })
+        } catch (error) {
+            toast.error('An error has occurred. Try again later')
+            console.log(error)
+        }
     }
 
     return (
