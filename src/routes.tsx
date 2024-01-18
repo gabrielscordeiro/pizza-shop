@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 
 import { AuthLayout } from '@/pages/_layouts/auth'
 import { PainelLayout } from '@/pages/_layouts/painel'
-import { Dashboard } from '@/pages/app/dashboard'
+import { Dashboard } from '@/pages/app/dashboard/dashboard.tsx'
 import { Orders } from '@/pages/app/orders/orders.tsx'
 import { SignIn } from '@/pages/auth/sign-in'
 import { SignUp } from '@/pages/auth/sing-up'
