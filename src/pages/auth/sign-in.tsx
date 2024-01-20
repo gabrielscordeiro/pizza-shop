@@ -1,9 +1,11 @@
+import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { signIn } from '@/api/sign-in.ts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,12 +18,20 @@ type SignInForm = z.infer<typeof signInForm>
 
 export function SignIn() {
 
-    const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignInForm>()
+    const {
+        register,
+        handleSubmit,
+        formState: { isSubmitting }
+    } = useForm<SignInForm>()
+
+    const { mutateAsync: authenticate } = useMutation({
+        mutationFn: signIn
+    })
 
     function handleSignIn(data: SignInForm) {
 
         try {
-            console.log(data)
+            authenticate({ email: data.email })
 
             toast.success('We send an authentication link to your e-mail.', {
                 action: {
@@ -46,7 +56,7 @@ export function SignIn() {
                     </Link>
                 </Button>
 
-                <div className="w-[350px] flex flex-col justify-center gap-6">
+                <div className="flex w-[350px] flex-col justify-center gap-6">
                     <div className="flex flex-col gap-2 text-center">
                         <h1 className="text-2xl font-semibold tracking-tight">Access Dashboard</h1>
                         <p className="text-sm text-muted-foreground">Track your sales through the partner dashboard</p>
