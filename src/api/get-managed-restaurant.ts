@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios.ts'
 
-interface getManagedRestaurant {
+export interface GetManagedRestaurantResponse {
     id: string
     name: string
     createdAt: Date | null
@@ -10,7 +10,7 @@ interface getManagedRestaurant {
 }
 
 export async function getManagedRestaurant() {
-    const response = await api.get<getManagedRestaurant>('/managed-restaurant')
+    const response = await api.get<GetManagedRestaurantResponse>('/managed-restaurant')
 
     return response.data
 }
