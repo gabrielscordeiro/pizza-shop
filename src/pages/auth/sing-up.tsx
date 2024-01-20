@@ -1,9 +1,11 @@
+import { useMutation } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { registerRestaurant } from '@/api/register-restaurant.ts'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,19 +21,32 @@ type SignUpForm = z.infer<typeof SignUpForm>
 
 export function SignUp() {
 
-    const { register, handleSubmit, formState: { isSubmitting } } = useForm<SignUpForm>()
+    const {
+        register,
+        handleSubmit,
+        formState: { isSubmitting }
+    } = useForm<SignUpForm>()
+
+    const { mutateAsync: registerRestaurantFn } = useMutation({
+        mutationFn: registerRestaurant
+    })
 
     const navigate = useNavigate()
 
-    function handleSignUp(data: SignUpForm) {
+    async function handleSignUp(data: SignUpForm) {
 
         try {
-            console.log(data)
+            await registerRestaurantFn({
+                restaurantName: data.restaurantName,
+                managerName: data.managerName,
+                email: data.email,
+                phone: data.phone
+            })
 
             toast.success('Restaurant successfully registered.', {
                 action: {
                     label: 'Login',
-                    onClick: () => navigate('/sign-in')
+                    onClick: () => navigate(`/sign-in?email=${data.email}`)
                 }
             })
         } catch (error) {
@@ -49,7 +64,7 @@ export function SignUp() {
                         Already have an account? Log in
                     </Link>
                 </Button>
-                <div className="w-[350px] flex flex-col justify-center gap-6">
+                <div className="flex w-[350px] flex-col justify-center gap-6">
                     <div className="flex flex-col gap-2 text-center">
                         <h1 className="text-2xl font-semibold tracking-tight">Create a new free account</h1>
                         <p className="text-sm text-muted-foreground">Become a partner and start your sales</p>
