@@ -1,11 +1,25 @@
+import { formatDistanceToNow } from 'date-fns'
+import { enUS } from 'date-fns/locale'
 import { ArrowRight, Search, X } from 'lucide-react'
 
+import { OrderStatus } from '@/components/order-status.tsx'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { priceFormatter } from '@/lib/formatter.ts'
 import { OrderDetails } from '@/pages/app/orders/order-details'
 
-export function OrderTableRow() {
+interface OrderTableRowProps {
+    order: {
+        orderId: string
+        createdAt: string
+        status: 'pending' | 'canceled' | 'processing' | 'delivering' | 'delivered'
+        customerName: string
+        total: number
+    }
+}
+
+export function OrderTableRow({ order }: OrderTableRowProps) {
     return (
         <TableRow>
             <TableCell>
@@ -22,26 +36,26 @@ export function OrderTableRow() {
             </TableCell>
 
             <TableCell className="font-mono text-sm font-medium">
-                5feef13b-90fa-4798
+                {order.orderId}
             </TableCell>
 
             <TableCell className="text-muted-foreground">
-                15 minutes ago
+                {formatDistanceToNow(order.createdAt, {
+                    locale: enUS,
+                    addSuffix: true
+                })}
             </TableCell>
 
             <TableCell>
-                <div className="flex items-center gap-2">
-                    <span className="size-2 rounded-full bg-slate-400"></span>
-                    <span className="font-medium text-muted-foreground">Pending</span>
-                </div>
+                <OrderStatus status={order.status}/>
             </TableCell>
 
             <TableCell className="font-medium">
-                Gabriel Schmidt Cordeiro
+                {order.customerName}
             </TableCell>
 
             <TableCell className="font-medium">
-                US$ 100,00
+                {priceFormatter.format(order.total)}
             </TableCell>
 
             <TableCell>
