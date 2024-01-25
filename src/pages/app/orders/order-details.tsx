@@ -1,105 +1,123 @@
+import { useQuery } from '@tanstack/react-query'
+import { formatDistanceToNow } from 'date-fns'
+import { enUS } from 'date-fns/locale'
+
+import { getOrderDetails } from '@/api/get-order-details.ts'
+import { OrderStatus } from '@/components/order-status.tsx'
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table.tsx'
+import { priceFormatter } from '@/lib/formatter.ts'
 
-export function OrderDetails() {
+export interface OrderDetailsProps {
+    orderId: string
+    open: boolean
+}
+
+export function OrderDetails({ orderId, open }: OrderDetailsProps) {
+    const { data: order } = useQuery({
+        queryKey: ['order', orderId],
+        queryFn: () => getOrderDetails({ orderId }),
+        enabled: open
+    })
+
+
+
     return (
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Order: 5feef13b-90fa-4798</DialogTitle>
+                <DialogTitle>Order: {orderId}</DialogTitle>
                 <DialogDescription>
                     Order details
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6">
-                <Table>
-                    <TableBody>
-                        <TableRow>
-                            <TableCell className="text-muted-foreground">Status</TableCell>
+            {order && (
+                <div className="space-y-6">
+                    <Table>
+                        <TableBody>
+                            <TableRow>
+                                <TableCell className="text-muted-foreground">Status</TableCell>
 
-                            <TableCell className="flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    <span className="size-2 rounded-full bg-slate-400"></span>
-                                    <span className="font-medium text-muted-foreground">Pending</span>
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                <TableCell className="flex justify-end">
+                                    <OrderStatus status={order.status} />
+                                </TableCell>
+                            </TableRow>
 
-                        <TableRow>
-                            <TableCell className="text-muted-foreground">Client</TableCell>
+                            <TableRow>
+                                <TableCell className="text-muted-foreground">Client</TableCell>
 
-                            <TableCell className="flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    Gabriel Schmidt Cordeiro
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                <TableCell className="flex justify-end">
+                                    <div className="flex items-center gap-2">
+                                        {order.customer.name}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
 
-                        <TableRow>
-                            <TableCell className="text-muted-foreground">Phone number</TableCell>
+                            <TableRow>
+                                <TableCell className="text-muted-foreground">Phone number</TableCell>
 
-                            <TableCell className="flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    (47) 99998-9999
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                <TableCell className="flex justify-end">
+                                    <div className="flex items-center gap-2">
+                                        {order.customer.phone ?? 'Not informed'}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
 
 
-                        <TableRow>
-                            <TableCell className="text-muted-foreground">E-mail</TableCell>
+                            <TableRow>
+                                <TableCell className="text-muted-foreground">E-mail</TableCell>
 
-                            <TableCell className="flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    gabrielcordeiro.dev@gmail.com
-                                </div>
-                            </TableCell>
-                        </TableRow>
+                                <TableCell className="flex justify-end">
+                                    <div className="flex items-center gap-2">
+                                        {order.customer.email}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
 
 
-                        <TableRow>
-                            <TableCell className="text-muted-foreground">Accomplished in</TableCell>
+                            <TableRow>
+                                <TableCell className="text-muted-foreground">Accomplished in</TableCell>
 
-                            <TableCell className="flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    15 minutes ago
-                                </div>
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
+                                <TableCell className="flex justify-end">
+                                    <div className="flex items-center gap-2">
+                                        {formatDistanceToNow(order.createdAt, {
+                                            locale: enUS,
+                                            addSuffix: true
+                                        })}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
 
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Product</TableHead>
-                            <TableHead className="text-right">Quantity</TableHead>
-                            <TableHead className="text-right">Price</TableHead>
-                            <TableHead className="text-right">Total</TableHead>
-                        </TableRow>
-                    </TableHeader>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Product</TableHead>
+                                <TableHead className="text-right">Quantity</TableHead>
+                                <TableHead className="text-right">Price</TableHead>
+                                <TableHead className="text-right">Total</TableHead>
+                            </TableRow>
+                        </TableHeader>
 
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>Pizza Pepperoni</TableCell>
-                            <TableCell className="text-right">2</TableCell>
-                            <TableCell className="text-right">US$ 19,90</TableCell>
-                            <TableCell className="text-right">US$ 39,80</TableCell>
-                        </TableRow>
-                        <TableRow>
-                            <TableCell>Pizza Margherita</TableCell>
-                            <TableCell className="text-right">1</TableCell>
-                            <TableCell className="text-right">US$ 16,00</TableCell>
-                            <TableCell className="text-right">US$ 16,00</TableCell>
-                        </TableRow>
-                    </TableBody>
+                        <TableBody>
+                            {order.orderItems.map(item => (
+                                <TableRow key={item.id}>
+                                    <TableCell>{item.product.name}</TableCell>
+                                    <TableCell className="text-right">{item.quantity}</TableCell>
+                                    <TableCell className="text-right">{priceFormatter.format(item.priceInCents / 100)}</TableCell>
+                                    <TableCell className="text-right">{priceFormatter.format((item.priceInCents / 100) * item.quantity)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
 
-                    <TableFooter>
-                        <TableCell colSpan={3}>Total order</TableCell>
-                        <TableCell className="text-right font-medium">US$ 55,80</TableCell>
-                    </TableFooter>
-                </Table>
-            </div>
+                        <TableFooter>
+                            <TableCell colSpan={3}>Total order</TableCell>
+                            <TableCell className="text-right font-medium">{priceFormatter.format(order.totalInCents / 100)}</TableCell>
+                        </TableFooter>
+                    </Table>
+                </div>
+            )}
         </DialogContent>
     )
 }
