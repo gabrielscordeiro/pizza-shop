@@ -1,16 +1,38 @@
 import { useQuery } from '@tanstack/react-query'
+import { subDays } from 'date-fns'
+import { useMemo, useState } from 'react'
+import { DateRange } from 'react-day-picker'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import colors from 'tailwindcss/colors'
 
 import { getDailyRevenueInPeriod } from '@/api/get-daily-revenue-in-period.ts'
+import { DateRangePicker } from '@/components/date-range-picker.tsx'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label.tsx'
 import { priceFormatter } from '@/lib/formatter.ts'
 
 export  function RevenueChart() {
-    const { data: dailyRevenueInPeriod} = useQuery({
-        queryFn: getDailyRevenueInPeriod,
-        queryKey: ['metrics', 'daily-revenue-in-period']
+    const [dateRange, setDateRange] = useState<DateRange | undefined>({
+        from: subDays(new Date(), 7),
+        to: new Date(),
     })
+
+    const { data: dailyRevenueInPeriod} = useQuery({
+        queryFn: () => getDailyRevenueInPeriod({
+            from: dateRange?.from,
+            to: dateRange?.to
+        }),
+        queryKey: ['metrics', 'daily-revenue-in-period', dateRange]
+    })
+
+    const chartData = useMemo(() => {
+        return dailyRevenueInPeriod?.map((chartItem) => {
+            return {
+                date: chartItem.date,
+                receipt: chartItem.receipt / 100
+            }
+        })
+    }, [dailyRevenueInPeriod])
 
 
     return (
@@ -20,12 +42,17 @@ export  function RevenueChart() {
                     <CardTitle className="text-base font-medium">Revenue in the period</CardTitle>
                     <CardDescription>Daily revenue in the period</CardDescription>
                 </div>
+
+                <div className="flex items-center gap-3">
+                    <Label>Period</Label>
+                    <DateRangePicker date={dateRange} onDateChange={setDateRange}/>
+                </div>
             </CardHeader>
 
             <CardContent>
-                {dailyRevenueInPeriod && (
+                {chartData && (
                     <ResponsiveContainer width="100%" height={240}>
-                        <LineChart data={dailyRevenueInPeriod} style={{ fontSize: 12}}>
+                        <LineChart data={chartData} style={{ fontSize: 12}}>
                             <XAxis
                                 dataKey="date"
                                 axisLine={false}
