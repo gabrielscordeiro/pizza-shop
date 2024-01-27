@@ -7,6 +7,7 @@ import { OrderStatus } from '@/components/order-status.tsx'
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table.tsx'
 import { priceFormatter } from '@/lib/formatter.ts'
+import { OrderDetailsSkeleton } from '@/pages/app/orders/order-details-skeleton.tsx'
 
 export interface OrderDetailsProps {
     orderId: string
@@ -31,7 +32,7 @@ export function OrderDetails({ orderId, open }: OrderDetailsProps) {
                 </DialogDescription>
             </DialogHeader>
 
-            {order && (
+            {order ? (
                 <div className="space-y-6">
                     <Table>
                         <TableBody>
@@ -117,6 +118,8 @@ export function OrderDetails({ orderId, open }: OrderDetailsProps) {
                         </TableFooter>
                     </Table>
                 </div>
+            ) : (
+                <OrderDetailsSkeleton />
             )}
         </DialogContent>
     )
