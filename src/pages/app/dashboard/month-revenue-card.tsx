@@ -4,6 +4,7 @@ import { DollarSign } from 'lucide-react'
 import { getMonthRevenueOrdersAmount } from '@/api/get-month-revenue.ts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx'
 import { priceFormatter } from '@/lib/formatter.ts'
+import { MetricCardSkeleton } from '@/pages/app/dashboard/metric-card-skeleton.tsx'
 
 export function MonthRevenueCard() {
 
@@ -20,7 +21,7 @@ export function MonthRevenueCard() {
             </CardHeader>
 
             <CardContent className="space-y-1">
-                {monthRevenue && (
+                {monthRevenue ? (
                     <>
                         <span className="text-2xl font-bold tracking-tight">{priceFormatter.format((monthRevenue.receipt / 100))}</span>
                         <p className="text-xs text-muted-foreground">
@@ -32,6 +33,8 @@ export function MonthRevenueCard() {
                             {' '} compared to last month
                         </p>
                     </>
+                ) : (
+                    <MetricCardSkeleton />
                 )}
             </CardContent>
         </Card>
