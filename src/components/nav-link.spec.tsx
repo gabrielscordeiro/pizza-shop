@@ -4,7 +4,7 @@ import { expect } from 'vitest'
 
 import { NavLink } from '@/components/nav-link'
 
-describe('MavLink', () => {
+describe('NavLink', () => {
     it('should highlight the nav link when is the current page link', () => {
         const wrapper = render(
             <>
