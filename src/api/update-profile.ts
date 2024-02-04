@@ -1,7 +1,6 @@
 import { api } from '@/lib/axios.ts'
 
-
-interface UpdateProfileBody {
+export interface UpdateProfileBody {
     name: string
     description: string | null
 }

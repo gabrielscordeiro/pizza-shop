@@ -2,7 +2,6 @@ import { http, HttpResponse } from 'msw'
 
 import { RegisterRestaurantBody } from '@/api/register-restaurant'
 
-
 export const registerRestaurantMock = http.post<never, RegisterRestaurantBody>('/restaurants', async ({ request }) => {
     const { restaurantName } = await request.json()
 
