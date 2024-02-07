@@ -39,14 +39,14 @@ export function SignIn() {
         try {
             await authenticate({ email: data.email })
 
-            toast.success('We send an authentication link to your e-mail.', {
+            toast.success('We send an authentication link to your email.', {
                 action: {
                     label: 'Resend',
                     onClick: () => handleSignIn(data)
                 }
             })
         } catch (error) {
-            toast.error('An error has occurred. Try again later')
+            toast.error('An error has occurred. Try again later!')
             console.log(error)
         }
     }
