@@ -90,7 +90,7 @@ export function SignUp() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Your e-mail:</Label>
+                            <Label htmlFor="email">Your email:</Label>
                             <Input
                                 id="email"
                                 type="text"
